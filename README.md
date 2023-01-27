@@ -1,8 +1,8 @@
 # Introduction
 
-Run an EC2 instance with Minikube.
-Deploy an application.
-Expose Minikube with a reverse proxy.
+- Run an EC2 instance with Minikube.
+- Deploy an application.
+- Expose Minikube with a reverse proxy.
 
 The scripts will create resources in: us-east-1
 
