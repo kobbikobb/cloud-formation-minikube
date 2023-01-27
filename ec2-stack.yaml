@@ -1,0 +1,76 @@
+---
+Parameters:
+
+  AvailabilityZone:
+    Type: String
+    Default: us-east-1a
+  AmazonLinux2AMI:
+    Type: String
+    Default: ami-0b5eea76982371e91
+
+Resources:
+  MinikubeInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Ref AvailabilityZone
+      ImageId: !Ref AmazonLinux2AMI
+      InstanceType: t2.medium
+      UserData: 
+        Fn::Base64:
+          | 
+          #!/bin/bash
+          yum update -y
+
+          # Install Apache httpd
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+
+          # Install Docker
+          amazon-linux-extras install docker -y
+          service docker start
+          systemctl enable docker
+          usermod -a -G docker ec2-user
+          chmod 666 /var/run/docker.sock
+
+          # Install kubectl
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+
+          # Install minikube
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          chmod +x minikube
+          mv minikube /usr/local/bin/minikube
+
+          # Install git
+          yum install git -y
+
+      SecurityGroups:
+        - !Ref SSHSecurityGroup
+        - !Ref HTTPSecurityGroup
+
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 22
+        ToPort: 22
+        IpProtocol: tcp
+
+  HTTPSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Enable standard web access
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+
+  ElasticIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref MinikubeInstance

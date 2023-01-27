@@ -1,0 +1,1 @@
+aws cloudformation update-stack --stack-name ec2-docker-compose --template-body file://ec2-stack.yaml --region us-east-1

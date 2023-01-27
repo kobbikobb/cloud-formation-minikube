@@ -1,0 +1,1 @@
+aws cloudformation list-stacks --region us-east-1

@@ -1,0 +1,1 @@
+aws cloudformation delete-stack --stack-name ec2-minikube --region us-east-1
