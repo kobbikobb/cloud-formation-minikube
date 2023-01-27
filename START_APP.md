@@ -1,14 +1,15 @@
 # Clone and run a sample application
-cd /home/ec2-user
 git clone https://github.com/kobbikobb/guessthename.git
 
 # Start minikube
 minikube start
-minikube addons enable ingress
 
 # Deploy sample application
 cd guessthename
 ./k8s/deploy.sh
+
+# Enable ingress
+minikube addons enable ingress
 
 # Edit httpd to provide a reverse proxy
 INGRESS_IP="$(kubectl get ingress | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')"
